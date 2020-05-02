@@ -58,17 +58,15 @@ class Computation(threading.Thread):
     
     def __init__(self):
         super(Computation, self).__init__(daemon=True)
-        with self.__class__._in_flight_count_guard:
-            self.__class__._in_flight_count += 1
 
     def run(self):
-        global in_flight_count_guard
-        global in_flight_count
+        with self.__class__._in_flight_count_guard:
+            self.__class__._in_flight_count += 1
         print("Started computation")
         time.sleep(120) 
+        print("Finished computation")
         with self.__class__._in_flight_count_guard:
             self.__class__._in_flight_count -= 1
-        print("Finished computation")
    
     @classmethod
     def in_flight_count(cls) -> int:
@@ -78,5 +76,6 @@ class Computation(threading.Thread):
 
 @app.route('/start_computation', methods=['POST'])
 def start_computation():
+    in_flight = Computation.in_flight_count() 
     Computation().start()
-    return f"Launched the computation in background. In total running: {Computation.in_flight_count()}\n"
+    return f"Launched the computation in background. In total running: {in_flight + 1}\n"
