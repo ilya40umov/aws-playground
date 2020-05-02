@@ -34,11 +34,14 @@ git clone https://github.com/ilya40umov/aws-basics
 
 cd ..
 chown ec2-user:ec2-user app
+chmod 2750 app/
 find app -name '*' -exec chown ec2-user:ec2-user {} +
-chmod -R 2740 app/
+find app -type d -exec chmod 2750 {} +
+find app -type f -exec chmod 0640 {} +
 
 cd app/aws-basics/cloudwatch-custom-metric
 pip3 install -r requirements.txt
 
+chmod u+x run.sh
 su ec2-user -c ./run.sh 
 ```
