@@ -22,10 +22,10 @@ if os.environ.get('USE_LOCALSTACK'):
     session = localstack_client.session.Session()
     cloudwatch = session.client('cloudwatch')
 else:
-    cloudwatch = boto3.client('cloudwatch')
+    cloudwatch = boto3.client('cloudwatch', region_name='eu-west-1')
 
 
-@cron.scheduled_job('interval', seconds=5)
+@cron.scheduled_job('interval', minutes=1)
 def report_in_flight_count_to_cloudwatch():
     response = cloudwatch.put_metric_data(
         MetricData = [

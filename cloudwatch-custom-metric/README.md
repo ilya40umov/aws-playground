@@ -1,6 +1,6 @@
-#### ASG scaling on custom metric
+#### Report custom metric to CloudWatch
 
-App for testing ASG scaling based on a custom metric.
+A flask app that is reporting a custom metric to CloudWatch every minute
 
 ##### Development
 
@@ -11,7 +11,12 @@ pip3 install -r requirements.txt
 
 docker-compose up
 
-python3 -m flask run
+USE_LOCALSTACK=true python3 -m flask run
+```
+
+```
+curl http://localhost:5000/
+curl -XPOST http://localhost:5000/start_computation
 ```
 
 ##### EC2 User Data
@@ -28,5 +33,5 @@ cd app
 git clone https://github.com/ilya40umov/aws-basics
 cd aws-basics/asg-custom-metric-policy
 sudo pip3 install -r requirements.txt
-nohup python3 waitress_server.py 2>&1 & > app.log
+nohup python3 waitress_server.py 2>&1 & > /dev/null
 ```
