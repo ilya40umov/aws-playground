@@ -18,12 +18,15 @@ python3 -m flask run
 
 ```
 #!/bin/bash
-
+sudo yum -y update
+sudo yum -y install git python3
 cd /opt
-mkdir app
+sudo mkdir app
+sudo chown ec2-user:ec2-user app
+sudo chmod 2770 app/
 cd app
 git clone https://github.com/ilya40umov/aws-basics
 cd aws-basics/asg-custom-metric-policy
-pip3 install -r requirements.txt
-python3 waitress_server.py 
+sudo pip3 install -r requirements.txt
+nohup python3 waitress_server.py 2>&1 & > app.log
 ```
