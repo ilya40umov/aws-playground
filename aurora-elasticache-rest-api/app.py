@@ -56,17 +56,20 @@ class TodoDao(object):
         todo = TodoModel(task=data['task'])
         db.session.add(todo)
         db.session.commit()
+        cache.clear()
         return todo
 
     def update(self, id, data):
         todo = self.get(id)
         todo.task = data['task']
         db.session.commit()
+        cache.clear()
         return todo
 
     def delete(self, id):
         TodoModel.query.filter_by(id=id).delete()
         db.session.commit()
+        cache.clear()
 
 
 todo_dao = TodoDao()
