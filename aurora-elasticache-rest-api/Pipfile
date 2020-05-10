@@ -1,0 +1,21 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+Flask = "*"
+waitress = "*"
+redis = "*"
+Flask-SQLAlchemy = "*"
+Flask-Session = "*"
+flask-restx = "*"
+PyMySQL = "*"
+Flask-Cache = "*"
+Werkzeug = "*"
+flask-caching = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.7"

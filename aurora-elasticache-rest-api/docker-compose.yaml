@@ -1,0 +1,31 @@
+version: '3.6'
+
+services:
+  maria:
+    image: mariadb
+    restart: always
+    ports:
+      - 33306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpass
+      - MYSQL_DATABASE=todo
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 15s
+      timeout: 30s
+      retries: 3
+  redis:
+    image: redis
+    ports:
+      - 36379:6379
+    healthcheck:
+      test: ["CMD", "redis-cli","ping"]
+      interval: 15s
+      timeout: 30s
+      retries: 3
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 172.177.97.0/24
