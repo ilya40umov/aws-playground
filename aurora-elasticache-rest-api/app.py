@@ -76,7 +76,7 @@ todo_dao = TodoDao()
 
 db.create_all()
 if not list(filter(lambda t: t.task == 'Dummy task', todo_dao.list())):
-    todo_dao.create({'task': 'Build an API'})
+    todo_dao.create({'task': 'Dummy task'})
 
 
 @ns_todos.route('/')
