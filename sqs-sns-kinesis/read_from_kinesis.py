@@ -31,11 +31,11 @@ record_response = kinesis.get_records(ShardIterator=shard_iterator, Limit=2)
 
 try:
     while 'NextShardIterator' in record_response:
-        record_response = kinesis.get_records(ShardIterator=record_response['NextShardIterator'], Limit=2)
         if record_response['Records']:
             for r in record_response['Records']:
                 print(r['Data'])
         else:
             time.sleep(5)
+        record_response = kinesis.get_records(ShardIterator=record_response['NextShardIterator'], Limit=2)
 except KeyboardInterrupt:
     print("Caught a keyboard interrupt. Stopping...")
