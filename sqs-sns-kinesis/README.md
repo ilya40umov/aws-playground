@@ -4,7 +4,9 @@ This app is testing a bit unusual set-up,
 where messages are sent to an SNS topic,
 which puts them into an SQS queue, 
 and then those messages are consumed from the SQS queue and put into a Kinesis stream.
-Whether this set-up actually makes sense in practice is a different topic. :)
+Whether this set-up actually makes sense in practice is a different topic, 
+as SQS queue is gonna mess up the ordering of the messages, 
+and one can't subsribe a FIFO queue to an SNS topic.
 
 ##### Local development
 
