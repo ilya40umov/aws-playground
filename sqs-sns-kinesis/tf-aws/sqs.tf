@@ -8,33 +8,6 @@ resource "aws_sqs_queue" "sqs_xyz_queue" {
 resource "aws_sqs_queue_policy" "sqs_xyz_queue" {
   queue_url = aws_sqs_queue.sqs_xyz_queue.id
   policy    = data.aws_iam_policy_document.sqs_xyz_queue.json 
-#<<POLICY
-#{
-#  "Version": "2012-10-17",
-#  "Id": "sqspolicy",
-#  "Statement": [
-#    {
-#      "Sid": "First",
-#      "Effect": "Allow",
-#      "Principal": "*",
-#      "Action": "sqs:SendMessage",
-#      "Resource": "${aws_sqs_queue.sqs_xyz_queue.arn}",
-#      "Condition": {
-#        "ArnEquals": {
-#          "aws:SourceArn": "${aws_sns_topic.sns_xyz_topic.arn}"
-#        }
-#      }
-#    },
-#    {
-#      "Sid": "Second",
-#      "Effect": "Allow",
-#      "Principal": {"type": "AWS", "identifiers": ["${aws_iam_role.aim_xyz_ec2_role.arn}"]},
-#      "Action": ["sqs:DeleteMessage", "sqs:ReceiveMessage"],
-#      "Resource": "${aws_sqs_queue.sqs_xyz_queue.arn}"
-#    }
-#  ]
-#}
-#POLICY
 }
 
 data "aws_iam_policy_document" "sqs_xyz_queue" {
