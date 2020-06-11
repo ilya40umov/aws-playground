@@ -2,7 +2,6 @@
 
 import boto3
 import argparse
-import json
 import time
 
 
@@ -18,7 +17,6 @@ if args.localstack:
     session = localstack_client.session.Session()
     kinesis = session.client('kinesis')
 else:
-    sqs = boto3.client('sqs', region_name='eu-west-1')
     kinesis = boto3.client('kinesis', region_name='eu-west-1')
 
 response = kinesis.describe_stream(StreamName=args.stream_name)
