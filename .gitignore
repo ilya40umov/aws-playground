@@ -3,3 +3,6 @@
 __pycache__/
 .localstack/
 nohup.out
+*.tfstate
+*.tfstate.backup
+.terraform
