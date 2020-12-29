@@ -1,0 +1,40 @@
+app: aws-basics
+service: sls-python-flask
+
+plugins:
+  - serverless-wsgi
+  - serverless-python-requirements
+  - serverless-localstack
+
+provider:
+  name: aws
+  runtime: python3.7
+  region: us-east-1
+
+functions:
+  app:
+    handler: wsgi_handler.handler
+    events:
+      - http: ANY /
+      - http: 'ANY {proxy+}'
+
+custom:
+  wsgi:
+    app: app.app
+    pythonBin: python3
+    packRequirements: false
+  localstack:
+    stages:
+      - local
+    host: http://localhost
+    edgePort: 4566
+    autostart: False
+    lambda:
+      mountCode: False
+    docker:
+      sudo: False
+
+package:
+  exclude:
+    - __pycache__/**
+

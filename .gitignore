@@ -6,3 +6,4 @@ nohup.out
 *.tfstate
 *.tfstate.backup
 .terraform
+.serverless
