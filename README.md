@@ -1,5 +1,5 @@
 # aws-basics
-My random experiments with various AWS technologies.
+Random experiments with various AWS technologies.
 
 ## Useful links
 
