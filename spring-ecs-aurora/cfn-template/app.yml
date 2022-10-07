@@ -1,0 +1,172 @@
+Description: 'CloudFormation template that deploys app-specific infra (e.g. ECS task/service)'
+
+Parameters:
+  
+  InfraStack:
+    Type: String
+    Description: 'Name used for creation of the base infra stack'
+    AllowedPattern: ^[a-zA-Z0-9\-]*$
+
+Resources:
+  
+  #
+  # App
+  #
+
+  AppTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2008-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+      Policies:
+        - PolicyName: AppTaskPolicy # XXX should be more restrictive
+          PolicyDocument:
+            Statement:
+            - Effect: Allow
+              Action:
+                - 'logs:*'
+                - 'ecr:*'
+                - 'secretsmanager:*'
+              Resource: '*'
+
+  AppTaskSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Enable inbound traffic on ports 8080 and 80
+      VpcId:
+        Fn::ImportValue: !Sub '${InfraStack}-Vpc'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          FromPort: 0
+          ToPort: 0
+          CidrIp: 0.0.0.0/0
+      Tags:
+      - Key: Name
+        Value: !Sub '${AWS::StackName}-AppTaskSecurityGroup'
+
+  AppToDatabaseSecurityGroupIngress:
+    Type: 'AWS::EC2::SecurityGroupIngress'
+    Properties:
+      GroupId: 
+        Fn::ImportValue: !Sub '${InfraStack}-DatabaseSecurityGroup'
+      SourceSecurityGroupId: !GetAtt AppTaskSecurityGroup.GroupId
+      IpProtocol: tcp
+      FromPort: 5432
+      ToPort: 5432
+
+  AppHttpTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 80
+      Protocol: HTTP
+      TargetType: ip
+      HealthCheckPath: /actuator/health
+      HealthCheckPort: 8080
+      HealthCheckProtocol: HTTP
+      HealthCheckIntervalSeconds: 45
+      UnhealthyThresholdCount: 3
+      HealthyThresholdCount: 3
+      VpcId:
+        Fn::ImportValue: !Sub '${InfraStack}-Vpc'
+
+  AppHttpListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener 
+    Properties:
+      LoadBalancerArn:
+        Fn::ImportValue: !Sub '${InfraStack}-LoadBalancerArn'
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: forward
+          ForwardConfig:
+            TargetGroups:
+              - TargetGroupArn: !Ref AppHttpTargetGroup
+                Weight: 1
+
+  AppLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      LogGroupName: !Sub '${AWS::StackName}-AppLogGroup'
+      RetentionInDays: 7
+
+  AppTask:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub '${AWS::StackName}-App'
+      Cpu: 256
+      Memory: 1024
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn: !Ref AppTaskRole
+      ContainerDefinitions:
+        - Name: springapp
+          Image:
+            Fn::Sub:
+              - '${EcrRepositoryUrl}:latest'
+              - EcrRepositoryUrl:
+                  Fn::ImportValue: !Sub '${InfraStack}-EcrRepositoryUrl'
+          Essential: 'true'
+          PortMappings:
+            - ContainerPort: 8080
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref AppLogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: springapp
+          Environment:
+            - Name: SPRING_DATASOURCE_URL
+              Value:
+                Fn::Sub:
+                  - 'jdbc:postgresql://${DatabaseEndpoint}:5432/${DBName}'
+                  - DatabaseEndpoint:
+                      Fn::ImportValue: !Sub '${InfraStack}-DatabaseEndpoint'
+                    DBName:
+                      Fn::ImportValue: !Sub '${InfraStack}-DBName'
+          Secrets:
+            - Name: SPRING_DATASOURCE_USERNAME 
+              ValueFrom: 
+                Fn::Sub:
+                  - 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${DatabaseSecretName}:username::'
+                  - DatabaseSecretName:
+                      Fn::ImportValue: !Sub '${InfraStack}-DatabaseSecretName'
+            - Name: SPRING_DATASOURCE_PASSWORD
+              ValueFrom: 
+                Fn::Sub:
+                  - 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${DatabaseSecretName}:password::'
+                  - DatabaseSecretName:
+                      Fn::ImportValue: !Sub '${InfraStack}-DatabaseSecretName'
+
+  AppService:
+    Type: AWS::ECS::Service
+    DependsOn: AppHttpListener
+    Properties:
+      Cluster:
+        Fn::ImportValue: !Sub '${InfraStack}-EcsCluster'
+      DesiredCount: 1
+      LaunchType: FARGATE
+      TaskDefinition: !Ref AppTask
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          Subnets:
+            - Fn::ImportValue: !Sub '${InfraStack}-SubnetAPrivate'
+            - Fn::ImportValue: !Sub '${InfraStack}-SubnetBPrivate'
+          SecurityGroups:
+            - !Ref AppTaskSecurityGroup
+      LoadBalancers:
+        - TargetGroupArn: !Ref AppHttpTargetGroup
+          ContainerName: springapp
+          ContainerPort: 8080

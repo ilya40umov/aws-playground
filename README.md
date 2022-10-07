@@ -5,6 +5,10 @@ Random experiments with various AWS technologies.
 
 ### AWS CloudFormation
 
+* [Getting Started](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/GettingStarted.Walkthrough.html)
+* [Learning Template Basics](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/gettingstarted.templatebasics.html)
+* [Walkthrough: Updating a stack](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/updating.stacks.walkthrough.html)
+* [Best Practices](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/best-practices.html)
 * [CloudFormation gotchas and lessons learned](https://medium.com/@rokaso/cloudformation-gotchas-and-lessons-learned-22a671556b6b)
 * [How do I update a CloudFormation stack that's failing because of a resource that I manually deleted?](https://aws.amazon.com/premiumsupport/knowledge-center/failing-stack-updates-deleted/)
 
