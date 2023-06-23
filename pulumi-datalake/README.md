@@ -1,5 +1,9 @@
 # DataLake with Pulumi
 
+## Test datasources
+
+* https://datahub.io/core/population-city
+
 ## S3 buckets
 
 * An **S3** bucket for `landing` / `raw zone`
