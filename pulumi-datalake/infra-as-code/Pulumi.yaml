@@ -1,0 +1,6 @@
+name: pulumi-datalake
+runtime:
+  name: python
+  options:
+    virtualenv: venv
+description: DataLake with Pulumi
