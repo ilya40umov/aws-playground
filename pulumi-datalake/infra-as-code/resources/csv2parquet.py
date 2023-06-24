@@ -7,7 +7,7 @@ from resources.s3 import S3Buckets
 
 class CsvToParquetLambda(object):
     def __init__(self, s3_buckets: S3Buckets):
-        self.role = iam.Role(
+        self.lambda_role = iam.Role(
             "CsvToParquetLambdaRole",
             assume_role_policy=json.dumps(
                 {
@@ -28,7 +28,6 @@ class CsvToParquetLambda(object):
                     policy=Output.all(
                         s3_buckets.raw_zone_bucket.arn,
                         s3_buckets.clean_zone_bucket.arn,
-                        s3_buckets.curated_zone_bucket.arn,
                     ).apply(self.__create_inline_policy),
                 )
             ],
@@ -37,7 +36,7 @@ class CsvToParquetLambda(object):
             "CsvToParquetLambda",
             name="CsvToParquetLambda",
             code=pulumi.FileArchive("../csv2parquet/"),
-            role=self.role.arn,
+            role=self.lambda_role.arn,
             handler="lambda_function.lambda_handler",
             runtime="python3.10",
             environment=lambda_.FunctionEnvironmentArgs(
@@ -52,7 +51,6 @@ class CsvToParquetLambda(object):
             timeout=300,
             memory_size=256,
         )
-        self.subscribe_to_raw_bucket(s3_buckets)
 
     @staticmethod
     def __create_inline_policy(bucket_arns: list) -> str:
@@ -79,24 +77,3 @@ class CsvToParquetLambda(object):
             }
         )
 
-    def subscribe_to_raw_bucket(self, s3_buckets: S3Buckets):
-        allow_bucket_to_exec_lambda = lambda_.Permission(
-            "AllowRawBucketToExecuteLambda",
-            action="lambda:InvokeFunction",
-            function=self.lambda_function.arn,
-            principal="s3.amazonaws.com",
-            source_arn=s3_buckets.raw_zone_bucket.arn,
-        )
-        s3.BucketNotification(
-            "OnMatchinCsvFileCreatedInRawBucket",
-            opts=pulumi.ResourceOptions(depends_on=[allow_bucket_to_exec_lambda]),
-            bucket=s3_buckets.raw_zone_bucket,
-            lambda_functions=[
-                s3.BucketNotificationLambdaFunctionArgs(
-                    lambda_function_arn=self.lambda_function.arn,
-                    events=["s3:ObjectCreated:*"],
-                    filter_prefix="manual_uploads/",
-                    filter_suffix=".csv",
-                )
-            ],
-        )
