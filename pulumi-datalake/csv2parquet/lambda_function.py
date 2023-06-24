@@ -6,10 +6,6 @@ from urllib.parse import unquote_plus
 DB_NAME = "csv2parquet"
 
 
-def get_env() -> str:
-    return
-
-
 def lambda_handler(event, context):
     record = event["Records"][0]
     bucket = record["s3"]["bucket"]["name"]
