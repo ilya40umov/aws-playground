@@ -23,6 +23,7 @@ class S3Subscriptions(object):
             lambda_function_arn=csv2parquet_lambda.lambda_function.arn,
             raw_zone_bucket_name=s3_buckets.raw_zone_bucket.bucket,
             filter_prefix="manual_uploads/",
+            filter_suffix=".csv",
         )
         self.__subscribe_step_function_to_raw_bucket(
             step_function_arn=csv2parquet_step_fun.state_machine.arn,
@@ -35,6 +36,7 @@ class S3Subscriptions(object):
         lambda_function_arn: Output[str],
         raw_zone_bucket_name: Output[str],
         filter_prefix: str,
+        filter_suffix: str,
     ):
         on_object_created_rule = cloudwatch.EventRule(
             "RawZoneObjectCreatedLambdaRule",
@@ -46,7 +48,7 @@ class S3Subscriptions(object):
                         "detail-type": ["Object Created"],
                         "detail": {
                             "bucket": {"name": [bucket_name]},
-                            "object": {"key": [{"prefix": filter_prefix}]},
+                            "object": {"key": [{"prefix": filter_prefix}, {"suffix": filter_suffix}]},
                         },
                     }
                 )
