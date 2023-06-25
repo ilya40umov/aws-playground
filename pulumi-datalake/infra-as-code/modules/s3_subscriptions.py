@@ -62,7 +62,7 @@ class S3Subscriptions(object):
         event_target = cloudwatch.EventTarget(
             "RawZoneObjectCreatedLambdaTarget",
             rule=on_object_created_rule.name,
-            arn=lambda_function_arn
+            arn=lambda_function_arn,
         )
 
     @staticmethod
