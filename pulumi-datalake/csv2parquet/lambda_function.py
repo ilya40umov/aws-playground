@@ -1,3 +1,4 @@
+import json
 import boto3
 import os
 import awswrangler as wr
@@ -7,9 +8,22 @@ DB_NAME = "csv2parquet"
 
 
 def lambda_handler(event, context):
-    record = event["Records"][0]
-    bucket = record["s3"]["bucket"]["name"]
-    key = unquote_plus(record["s3"]["object"]["key"])
+    bucket = None
+    key = None
+
+    if "Records" in event and event["Records"]:
+        print("Invoked with S3 payload")
+        record = event["Records"][0]
+        bucket = record["s3"]["bucket"]["name"]
+        key = unquote_plus(record["s3"]["object"]["key"])
+    elif "detail" in event:
+        print("Invoked with EventBridge payload")
+        bucket = event["detail"]["bucket"]["name"]
+        key = unquote_plus(event["detail"]["object"]["key"])
+    else:
+        print("Unsupported event: " + json.dumps(event, indent=2))
+        return "IGNORED"
+
     print(f"Bucket: {bucket}")
     print(f"Key: {key}")
 

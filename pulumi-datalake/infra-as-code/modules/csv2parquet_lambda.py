@@ -2,10 +2,10 @@ import json
 import pulumi
 from pulumi import Output
 from pulumi_aws import s3, iam, lambda_
-from resources.s3 import S3Buckets
+from modules.s3_buckets import S3Buckets
 
 
-class CsvToParquetLambda(object):
+class Csv2ParquetLambda(object):
     def __init__(self, s3_buckets: S3Buckets):
         self.lambda_role = iam.Role(
             "CsvToParquetLambdaRole",
@@ -76,4 +76,3 @@ class CsvToParquetLambda(object):
                 ],
             }
         )
-

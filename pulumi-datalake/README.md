@@ -2,35 +2,17 @@
 
 ## Test datasources
 
+These datasources can be potentially used to test the code:
 * https://datahub.io/core/population-city
+* https://www.kaggle.com/datasets/PROPPG-PPG/hourly-weather-surface-brazil-southeast-region
 
-## S3 buckets
+## Progress
 
-* An **S3** bucket for `landing` / `raw zone`
-* An **S3** bucket for `clean zone`
-* Aa **S3** bucket for `curated zone`
+- [x] **S3** buckets for `raw`, `clean` and `curated` zones are created
+- [x] **Lambda** is used to convert files from CSV to Parquet and register them in **Glue Catalog**
+- [x] **Athena** can be used to query the ingested data
+- [ ] **Step Function** is utilized to orchestrate CSV to Parquet conversion
+- [ ] **Glue workflow** is setup to to process (e.g. join) data and copy to the curated zone
+- [ ] **Redshift Spectrum** is used to load data into the data warehouse
+- [ ] **DMS** is setup to provide a CDC for a PostgreSQL database running on **RDS**
 
-## Using Lambda for converting file type
-
-* A **Lambda** function is used to convert the file format from CSV to Parquet
-* **Glue Catalog** is updated to catalog in the newly added data
-
-## Using Athena to query data
-
-* **Athena** and **Glue Catalog** are used to query the ingested data
-
-## Loading data into Redshift
-
-* **Redshift Spectrum** is used to load data into the data warehouse
-
-## Using Glue workflow & serverless Spark
-
-* **Glue workflow** is setup to to process (e.g. join) data and copy to the curated zone
-
-## Using StepFunctions to orchestrate a workflow
-
-* **Step Function** is utilized to orchestrate a multi-step workflow
-
-### A CDC pipeline with RDS and DMS
-
-* **DMS** is setup to provide a CDC for a PostgreSQL database running on **RDS**
