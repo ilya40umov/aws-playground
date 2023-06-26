@@ -6,16 +6,15 @@
 - [x] **Lambda** is used to convert files from CSV to Parquet and register them in **Glue Catalog**
 - [x] **Athena** can be used to query the ingested data
 - [x] **Step Function** is utilized to orchestrate CSV to Parquet conversion
-- [ ] **Glue workflow** is setup to to process (e.g. join) data and copy to the curated zone
+- [x] **Glue workflow** is used to perform CSV to Parquet conversion and some data manipulations
 - [ ] **Redshift Spectrum** is used to load data into the data warehouse
 - [ ] **DMS** is setup to provide a CDC for a PostgreSQL database running on **RDS**
 
 ## Links
 
-### Datasources
+### Sample Datasource
 
 * https://datahub.io/core/population-city
-* https://www.kaggle.com/datasets/PROPPG-PPG/hourly-weather-surface-brazil-southeast-region
 
 ### Docs
 

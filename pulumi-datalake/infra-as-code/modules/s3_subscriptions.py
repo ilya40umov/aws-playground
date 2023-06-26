@@ -48,7 +48,12 @@ class S3Subscriptions(object):
                         "detail-type": ["Object Created"],
                         "detail": {
                             "bucket": {"name": [bucket_name]},
-                            "object": {"key": [{"prefix": filter_prefix}, {"suffix": filter_suffix}]},
+                            "object": {
+                                "key": [
+                                    {"prefix": filter_prefix},
+                                    {"suffix": filter_suffix},
+                                ]
+                            },
                         },
                     }
                 )

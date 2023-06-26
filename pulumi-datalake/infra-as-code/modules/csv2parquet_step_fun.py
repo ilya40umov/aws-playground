@@ -7,7 +7,12 @@ from modules.sns_topics import SnsTopics
 
 
 class Csv2ParquetStepFunction(object):
-    def __init__(self, csv2parquet_lambda: Csv2ParquetLambda, sns_topics: SnsTopics):
+    def __init__(
+        self,
+        aws_region: str,
+        csv2parquet_lambda: Csv2ParquetLambda,
+        sns_topics: SnsTopics,
+    ):
         self.step_function_role = iam.Role(
             "Csv2ParquetStateFunctionRole",
             assume_role_policy=json.dumps(
@@ -17,7 +22,7 @@ class Csv2ParquetStepFunction(object):
                         {
                             "Effect": "Allow",
                             "Principal": {
-                                "Service": "states.eu-central-1.amazonaws.com"
+                                "Service": f"states.{aws_region}.amazonaws.com"
                             },
                             "Action": "sts:AssumeRole",
                         }
