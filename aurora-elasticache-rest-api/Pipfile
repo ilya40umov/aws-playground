@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-werkzeug = "==2.2.3"
+werkzeug = "==3.0.1"
 waitress = "*"
 redis = "*"
 Flask = "==2.2.5"
